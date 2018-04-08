@@ -1,0 +1,15 @@
+/target
+/classes
+/checkouts
+pom.xml
+pom.xml.asc
+*.jar
+*.class
+/.lein-*
+/.nrepl-port
+.terraform/
+*.tfstate*
+/models
+/generated
+.DS_Store
+terraform/terraform.tf.json
