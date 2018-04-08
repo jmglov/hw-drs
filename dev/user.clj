@@ -6,6 +6,7 @@
             [clojure.spec.alpha :as s]
             [clojure.spec.gen.alpha :as gen]
             [hw-drs.config :as config]
+            [hw-drs.core :as core]
             [hw-drs.models :as models])
   (:import (java.time Instant
                       ZonedDateTime
@@ -36,19 +37,3 @@
 (defn publish-event []
   (sns/publish :topic-arn config/sns-purchase-events
                :message (json/generate-string (gen/generate event-generator))))
-
-(defn read-q [q]
-  (map (fn [{:keys [body]}] (-> body
-                                (json/parse-string true)
-                                :Message
-                                (json/parse-string true)))
-       (reduce
-        (fn [acc _]
-          (let [{:keys [messages]} (sqs/receive-message :queue-url q
-                                                        :max-number-of-messages 10
-                                                        :delete true)]
-            (if (not-empty messages)
-              (concat acc messages)
-              (reduced acc))))
-        []
-        (range))))
