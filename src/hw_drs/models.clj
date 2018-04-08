@@ -1,14 +1,11 @@
 (ns hw-drs.models
-  (:require [clojure.spec.alpha :as s])
-  (:import (java.time ZonedDateTime)
-           (java.time.format DateTimeFormatter)
-           (java.util UUID)))
-
-(def ts-formatter (DateTimeFormatter/ofPattern "yyyy-MM-dd'T'HH:mm:ssX"))
+  (:require [clojure.spec.alpha :as s]
+            [hw-drs.core :as core])
+  (:import (java.util UUID)))
 
 (defn iso-8601-instant? [s]
   (boolean
-   (try (ZonedDateTime/parse s ts-formatter)
+   (try (core/parse-ts s)
         (catch Throwable _))))
 
 (defn uuid-str? [s]

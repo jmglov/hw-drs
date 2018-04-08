@@ -35,27 +35,27 @@
                              :purchase/amount (constantly (s/gen (s/int-in 1 50000)))
                              :purchase/merchantId (constantly (gen/fmap str (gen/uuid)))}))
 
-(def report-generators {:hw-drw-report-hour-amount [(s/gen (s/int-in 0 24))
-                                                    (s/gen (s/int-in 1 50000))]
-                        :hw-drw-report-hour-amount-pm [(s/gen (s/int-in 0 24))
-                                                       (s/gen (s/int-in 1 50000))
-                                                       (s/gen :purchase/paymentMethod)]
-                        :hw-drw-report-amount-pm [(s/gen (s/int-in 1 50000))
-                                                  (s/gen :purchase/paymentMethod)]
-                        :hw-drw-report-day-merchant [(s/gen (s/int-in 1 29))
-                                                     (gen/fmap str (gen/uuid))]
-                        :hw-drw-report-merchant-pm [(gen/fmap str (gen/uuid))
-                                                    (s/gen :purchase/paymentMethod)]})
+(def report-generators {:hour-amount [(gen/fmap #(core/render-hours (core/parse-ts %)) datetime-generator)
+                                      (s/gen (s/int-in 1 50000))]
+                        :hour-amount-pm [(gen/fmap #(core/render-hours (core/parse-ts %)) datetime-generator)
+                                         (s/gen (s/int-in 1 50000))
+                                         (s/gen :purchase/paymentMethod)]
+                        :amount-pm [(s/gen (s/int-in 1 50000))
+                                    (s/gen :purchase/paymentMethod)]
+                        :day-merchant [(gen/fmap #(core/render-days (core/parse-ts %)) datetime-generator)
+                                       (gen/fmap str (gen/uuid))]
+                        :merchant-pm [(gen/fmap str (gen/uuid))
+                                      (s/gen :purchase/paymentMethod)]})
 
 (def datapoint-generator (gen/fmap (fn [report-type]
                                      (->> (report-generators report-type)
                                           (map gen/generate)
                                           (string/join "|")))
-                                   (s/gen #{:hw-drw-report-hour-amount
-                                            :hw-drw-report-hour-amount-pm
-                                            :hw-drw-report-amount-pm
-                                            :hw-drw-report-day-merchant
-                                            :hw-drw-report-merchant-pm})))
+                                   (s/gen #{:hour-amount
+                                            :hour-amount-pm
+                                            :amount-pm
+                                            :day-merchant
+                                            :merchant-pm})))
 
 (def aggregates-generator (s/gen :aggregate/aggregates
                                  {:aggregate/datapoint (constantly datapoint-generator)}))
