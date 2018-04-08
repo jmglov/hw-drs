@@ -21,7 +21,7 @@ Your business people want the following reports:
 
 ## How it works
 
-When a purchase is completed, the checkout system publishes an event to an SNS topic called `hw-drw-purchase-events`. An event is a JSON object:
+When a purchase is completed, the checkout system publishes an event to an SNS topic called `hw-drs-purchase-events`. An event is a JSON object:
 
 ```json
 {
@@ -33,13 +33,13 @@ When a purchase is completed, the checkout system publishes an event to an SNS t
 ```
 
 Subscribed to this topic are SQS queues for each report that need to be generated:
-* `hw-drw-report-hour-amount`
-* `hw-drw-report-hour-amount-pm`
-* `hw-drw-report-amount-pm`
-* `hw-drw-report-day-merchant`
-* `hw-drw-report-merchant-pm`
+* `hw-drs-report-hour-amount`
+* `hw-drs-report-hour-amount-pm`
+* `hw-drs-report-amount-pm`
+* `hw-drs-report-day-merchant`
+* `hw-drs-report-merchant-pm`
 
-Each of these queues is serviced by a Lambda function that runs once per minute, reads as many messages as are on the queue (up to 100, as the Lambda should finish quickly), and generates a list of aggregates. For example, given the event above, the `hw-drw-report-hour-amount-pm` function would generate an aggregate datapoint `2011-12-03:10|10-50|SLICE_IT`. All datapoints are then combined into a JSON object:
+Each of these queues is serviced by a Lambda function that runs once per minute, reads as many messages as are on the queue (up to 100, as the Lambda should finish quickly), and generates a list of aggregates. For example, given the event above, the `hw-drs-report-hour-amount-pm` function would generate an aggregate datapoint `2011-12-03:10|10-50|SLICE_IT`. All datapoints are then combined into a JSON object:
 
 ```json
 {
@@ -60,7 +60,7 @@ Each of these queues is serviced by a Lambda function that runs once per minute,
 }
 ```
 
-The function then publishes the aggregates to an SNS topic called `hw-drw-aggregates`, to which an SQS queue called `hw-drw-aggregates` is subscribed. The SNS message also triggers a Lambda function called `hw-drw-writer`, which reads each datapoint from a DynamoDB table called `hw-drw-reporting`, increments it by the number of events in the datapoint, then writes it back. The fact that there is only one thing writing to the database at a time means that we will never have a race condition which could lead to inconsistencies in our data.
+The function then publishes the aggregates to an SNS topic called `hw-drs-aggregates`, to which an SQS queue called `hw-drs-aggregates` is subscribed. The SNS message also triggers a Lambda function called `hw-drs-writer`, which reads each datapoint from a DynamoDB table called `hw-drs-reporting`, increments it by the number of events in the datapoint, then writes it back. The fact that there is only one thing writing to the database at a time means that we will never have a race condition which could lead to inconsistencies in our data.
 
 ## Setup
 
