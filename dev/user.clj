@@ -1,10 +1,18 @@
 (ns user
-  (:require [clojure.spec.alpha :as s]
+  (:require [amazonica.core :as amazonica]
+            [amazonica.aws.sns :as sns]
+            [amazonica.aws.sqs :as sqs]
+            [cheshire.core :as json]
+            [clojure.spec.alpha :as s]
             [clojure.spec.gen.alpha :as gen]
+            [hw-drs.config :as config]
             [hw-drs.models :as models])
   (:import (java.time Instant
                       ZonedDateTime
                       ZoneOffset)))
+
+(defn refresh-aws-credentials []
+  (amazonica/defcredential (amazonica/get-credentials {:profile "aws-dojo"})))
 
 (defn render-ts [ts]
   (.format models/ts-formatter (.atOffset (Instant/ofEpochMilli ts) ZoneOffset/UTC)))
@@ -22,4 +30,25 @@
 
 (def event-generator (s/gen :purchase/event
                             {:purchase/date (constantly datetime-generator)
+                             :purchase/amount (constantly (s/gen (s/int-in 1 50000)))
                              :purchase/merchantId (constantly (gen/fmap str (gen/uuid)))}))
+
+(defn publish-event []
+  (sns/publish :topic-arn config/sns-purchase-events
+               :message (json/generate-string (gen/generate event-generator))))
+
+(defn read-q [q]
+  (map (fn [{:keys [body]}] (-> body
+                                (json/parse-string true)
+                                :Message
+                                (json/parse-string true)))
+       (reduce
+        (fn [acc _]
+          (let [{:keys [messages]} (sqs/receive-message :queue-url q
+                                                        :max-number-of-messages 10
+                                                        :delete true)]
+            (if (not-empty messages)
+              (concat acc messages)
+              (reduced acc))))
+        []
+        (range))))

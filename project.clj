@@ -5,8 +5,9 @@
                  [amazonica "0.3.114" :exclusions [com.amazonaws/aws-java-sdk
                                                    com.amazonaws/amazon-kinesis-client
                                                    com.amazonaws/dynamodb-streams-kinesis-adapter]]
-                 [com.amazonaws/aws-java-sdk-core "1.11.274" :exclusions [com.fasterxml.jackson.dataformat/jackson-dataformat-cbor]]
-                 [com.amazonaws/aws-java-sdk-dynamodb "1.11.274"]
+                 [com.amazonaws/aws-java-sdk-core "1.11.311" :exclusions [com.fasterxml.jackson.dataformat/jackson-dataformat-cbor]]
+                 [com.amazonaws/aws-java-sdk-dynamodb "1.11.311"]
+                 [com.amazonaws/aws-java-sdk-sns "1.11.311"]
                  [cheshire "5.8.0"]
                  [environ "1.1.0"]
 
