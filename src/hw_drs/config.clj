@@ -1,5 +1,7 @@
 (ns hw-drs.config)
 
+(def max-events 100)
+
 (def sqs-report-hour-amount "https://sqs.eu-west-1.amazonaws.com/166399666252/hw-drs-report-hour-amount")
 (def sqs-report-hour-amount-pm "https://sqs.eu-west-1.amazonaws.com/166399666252/hw-drs-report-hour-amount-pm")
 (def sqs-report-amount-pm "https://sqs.eu-west-1.amazonaws.com/166399666252/hw-drs-report-amount-pm")
