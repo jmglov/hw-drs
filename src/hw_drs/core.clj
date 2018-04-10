@@ -17,7 +17,7 @@
 (defn render-hours [dt]
   (.format dt hours-formatter))
 
-(defn read-q [q max-num]
+(defn consume-q! [q max-num]
   (->> (reduce
         (fn [{:keys [remaining] :as acc} _]
           (let [{:keys [messages]} (sqs/receive-message :queue-url q

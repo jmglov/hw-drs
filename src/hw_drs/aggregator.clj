@@ -18,8 +18,8 @@
       (string/replace #"^hw-drs-report-" "")
       keyword))
 
-(defn read-events [msg ctx]
-  (core/read-q (q-uri ctx) config/max-events))
+(defn consume-events! [msg ctx]
+  (core/consume-q! (q-uri ctx) config/max-events))
 
 (defn aggregate [events ctx]
   (aggregates/events->aggregates events (report-type ctx)))
@@ -28,7 +28,7 @@
 
 (deflambdafn se.helloworld.drs.Aggregator [in out ctx]
   (-> (json/parse-stream (io/reader in) true)
-      (read-events ctx)
+      (consume-events! ctx)
       (aggregate ctx)
       (publish-aggregates ctx)
       (json/generate-stream (io/writer out))))
