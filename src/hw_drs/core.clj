@@ -1,5 +1,6 @@
 (ns hw-drs.core
-  (:require [amazonica.aws.sqs :as sqs]
+  (:require [amazonica.aws.sns :as sns]
+            [amazonica.aws.sqs :as sqs]
             [cheshire.core :as json])
   (:import (java.time ZonedDateTime)
            (java.time.format DateTimeFormatter)))
@@ -36,3 +37,12 @@
                                      (json/parse-string true)
                                      :Message
                                      (json/parse-string true))))))
+
+(defn publish [topic msg]
+  (sns/publish :topic-arn topic
+               :message (json/generate-string msg)))
+
+(defn read-item [table key])
+
+(defn write-item! [table item])
+
