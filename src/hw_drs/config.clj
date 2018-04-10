@@ -13,3 +13,5 @@
 
 (def sns-purchase-events "arn:aws:sns:eu-west-1:166399666252:hw-drs-purchase-events")
 (def sns-aggregates "arn:aws:sns:eu-west-1:166399666252:hw-drs-aggregates")
+
+(def aggregates-table "???")
