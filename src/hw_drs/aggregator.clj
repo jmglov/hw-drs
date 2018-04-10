@@ -24,7 +24,9 @@
 (defn aggregate [events ctx]
   (aggregates/events->aggregates events (report-type ctx)))
 
-(defn publish-aggregates [aggregates])
+;; Max size for SNS messages? Use S3 as blob store?
+(defn publish-aggregates [aggregates ctx]
+  (core/publish config/sns-aggregates aggregates))
 
 (deflambdafn se.helloworld.drs.Aggregator [in out ctx]
   (-> (json/parse-stream (io/reader in) true)
